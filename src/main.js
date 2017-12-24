@@ -1,4 +1,4 @@
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import ReactDOM from 'react-dom';
 import React from 'react';
 import * as reducers from './reducers';
@@ -8,15 +8,15 @@ import { Provider } from 'react-redux';
 import { Router, Route, browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
 import VisibleCards from './components/VisibleCards';
-import * as localStore from './localStore';
 import NewCardModal from './components/NewCardModal';
 import EditCardModal from './components/EditCardModal';
 import StudyModal from './components/StudyModal';
+import thunkMiddleware from 'redux-thunk';
+import { fetchData } from './actions';
 
 reducers.routing = routerReducer;
 
-//we can pass an object of state as the second parameter to store
-const store = createStore(combineReducers(reducers), localStore.getLocalStore());
+const store = createStore(combineReducers(reducers), applyMiddleware(thunkMiddleware));
 const history = syncHistoryWithStore(browserHistory, store); //syncs browser history with redux store
 
 //we want our visible cards to be displayed below our new card modal so this will be a nested route
@@ -28,10 +28,26 @@ const routes = (<Route path='/' component={App}>
   </Route>
 </Route>);
 
+//everytime the store changes, we want to save to the database server
+//we only want to really save when the decks or cards change, so maybe we can save a previous verison of cards and decks and compare those and only save and do fetch if diff
+function save() {
+  var state = store.getState();
+
+  fetch('/api/data', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      decks: state.decks,
+      cards: state.cards
+    })
+  });
+}
+
 function run() {
   let state = store.getState();
-
-  localStore.setLocalStore(state, ['decks', 'cards']);
 
   ReactDOM.render(
     (<Provider store={store}>
@@ -41,6 +57,11 @@ function run() {
     </Provider>), document.getElementById('root'));
 }
 
-run();
+function init() {
+  run();
+  store.subscribe(run);
+  store.subscribe(save);
+  store.dispatch(fetchData());
+}
 
-store.subscribe(run);
+init();

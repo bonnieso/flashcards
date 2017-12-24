@@ -8,8 +8,14 @@ var data = {};
 express()
   .use(express.static(__dirname + '/public'))
   .use(bodyParser.json())
-  .get('/api/data', (req, res) => res.json(data)) //post is where we would usually do our validation
-  .post('/api/data', (req, res) => res.json(data = req.body)) //evaluates to whatever the variable is
+  .get('/api/data', (req, res) => {
+    console.log('this is get', res.json(data));
+    res.json(data)
+  }) //post is where we would usually do our validation
+  .post('/api/data', (req, res) => {
+    console.log('this is post', req.body);
+    res.json(data = req.body)
+  }) //evaluates to whatever the variable is
   .get('*', (req, res) => res.sendFile(__dirname + '/public/index.html'))
   .listen(3333);
 
