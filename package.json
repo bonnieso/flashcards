@@ -18,11 +18,15 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "fuzzysearch": "^1.0.3",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "react-router": "^3.0.0",
     "react-router-redux": "^4.0.7",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0"
   }
 }

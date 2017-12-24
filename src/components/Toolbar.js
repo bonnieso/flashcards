@@ -1,19 +1,22 @@
 import React from 'react';
-import { showAddDeck } from '../actions';
+import { showAddDeck, filterCards } from '../actions';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
+//usually each action has a match dispatch to props
 const mapDispatchToProps = dispatch => ({
-  showAddDeck: () => dispatch(showAddDeck())
+  showAddDeck: () => dispatch(showAddDeck()),
+  onFilter: query => dispatch(filterCards(query))
 });
 
-const Toolbar = ({deckId, showAddDeck}) => {
-
-  console.log("this is deckId", deckId);
+//we take onfilter as a prop parameter
+const Toolbar = ({deckId, showAddDeck, onFilter }) => {
 
   let deckTools = deckId ? (<div>
-      <Link to={`/deck/${deckId}/new`}> + New Card </Link>
-      <Link to={`/deck/${deckId}/study`}> + Study Deck </Link>
+      <Link className='btn' to={`/deck/${deckId}/new`}> + New Card </Link>
+      <Link className='btn' to={`/deck/${deckId}/study`}> + Study Deck </Link>
+
+      <input onChange={e => onFilter(e.target.value)} className='search' type='search' placeholder='Search Deck...' />
     </div>) : null;
 
   return (<div className='toolbar'>
